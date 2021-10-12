@@ -1,8 +1,13 @@
 # Use nvidia/cuda:10.1-cudnn7-devel-ubuntu18.04 or later for CUDA.
 # Warning: All ARGs placed before FROM will only be scoped up unitl FROM statement.
 # https://github.com/docker/cli/blob/3c7ede6a68941f64c3a154c9a753eb7a9b1c2c3e/docs/reference/builder.md#understand-how-arg-and-from-interact
-ARG base_image="debian:stretch"
-FROM "${base_image}"
+ARG base_image
+FROM ${base_image}
+
+LABEL maintainer="alexhu@graphcore.ai"
+
+USER root
+ARG user_uid
 
 ARG python_version="3.6"
 ARG cloud_build="false"
@@ -12,8 +17,9 @@ ARG cuda_compute="7.0,7.5"
 ARG cxx_abi="0"
 ARG tpuvm=""
 
-RUN apt-get update
-RUN apt-get install -y git sudo python-pip python3-pip
+# Install dependent packages
+RUN apt-get update && apt-get install sudo python-pip python3-pip -y
+
 RUN git clone https://github.com/pytorch/pytorch
 
 # Disable CUDA for PyTorch
